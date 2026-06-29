@@ -1,5 +1,7 @@
 <?php
 
+require_once "db/mysql_connection.php";
+
 $url = $_SERVER['REQUEST_URI'];
 
 switch ($url) {
