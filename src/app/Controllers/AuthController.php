@@ -36,6 +36,22 @@ class AuthController {
 
         header('Location: /');
     }
+
+    public function updateData(array $data)
+    {
+        $this->userService->update($data);
+
+        header('Location: /profile');
+        exit;
+    }
+
+    public function changePassword(array $data)
+    {
+        $this->userService->changePassword($data);
+
+        header('Location: /profile');
+        exit;
+    }
 }
 
 $_SESSION['validation_errors'] = [];
@@ -50,4 +66,8 @@ switch ($_POST['action']) {
     case 'logout':
         $controller->logout();
         break;
+    case 'updateData':
+        $controller->updateData($_POST);
+    case 'changePassword':
+        $controller->changePassword($_POST);
 }

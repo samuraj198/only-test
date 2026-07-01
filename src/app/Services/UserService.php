@@ -12,9 +12,9 @@ class UserService {
         $this->userModel = new User($pdo);
     }
 
-    public function register(array $data): ?bool
+    public function register(array $data): bool
     {
-        $validatedData = $this->validate($data);
+        $validatedData = $this->validateForRegister($data);
 
         if ($validatedData != null) {
             $validatedData['password'] = password_hash($validatedData['password'], PASSWORD_DEFAULT);
@@ -29,10 +29,10 @@ class UserService {
             }
         }
 
-        return null;
+        return false;
     }
 
-    protected function validate(array $data): ?array
+    protected function validateForRegister(array $data): ?array
     {
         if ($data['password'] != $data['password_confirmation']) {
             $_SESSION['validation_errors'][] = "Пароли не совпадают";
@@ -70,7 +70,6 @@ class UserService {
             return false;
         } else {
             if (password_verify($data['password'], $user['password'])) {
-                unset($user['password']);
                 $_SESSION['user'] = $user;
                 $_SESSION['validation_errors'] = [];
 
@@ -117,5 +116,88 @@ class UserService {
         }
 
         return true;
+    }
+
+    public function update(array $data): bool
+    {
+        $validatedData = $this->validateForUpdate($data);
+
+        if ($validatedData != null) {
+            $stmt = $this->pdo->prepare("UPDATE `users` SET name = :name, 
+                                                           email = :email, 
+                                                           phone = :phone 
+                                                       WHERE id = :id");
+            $check = $stmt->execute([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'id' => $_SESSION['user']['id'],
+            ]);
+
+            if ($check) {
+                $_SESSION['user'] = $this->userModel->getUser($data['email']);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    protected function validateForUpdate(array $data): ?array
+    {
+        if (!password_verify($data['password'], $_SESSION['user']['password'])) {
+            $_SESSION['validation_errors'][] = 'Неверный пароль';
+            return null;
+        }
+
+        if (empty($data['name'])) {
+            $data['name'] = $_SESSION['user']['name'];
+        }
+        if (empty($data['email'])) {
+            $data['email'] = $_SESSION['user']['email'];
+        }
+        if (empty($data['phone'])) {
+            $data['phone'] = $_SESSION['user']['phone'];
+        }
+
+        $check = $this->userModel->checkFieldsForUniqueUpdate($data['name'], $data['email'], $data['phone']);
+
+        if ($check) {
+            $_SESSION['validation_errors'] = [];
+            return $data;
+        }
+
+        return null;
+    }
+
+    public function changePassword(array $data): bool
+    {
+        if (!password_verify($data['old_password'], $_SESSION['user']['password'])) {
+            $_SESSION['validation_errors'][] = 'Неверный пароль';
+            return false;
+        }
+
+        if ($data['new_password'] != $data['new_password_confirmation']) {
+            $_SESSION['validation_errors'][] = 'Пароли не совпадают';
+            return false;
+        }
+
+        $changePasswordCheck = $this->userModel->
+            changePassword(
+                password_hash(
+                    $data['new_password'],
+                    PASSWORD_DEFAULT),
+                $_SESSION['user']['id']
+            );
+
+        if ($changePasswordCheck) {
+            $_SESSION['user'] = $this->userModel->getUser($_SESSION['user']['email']);
+            return true;
+        }
+
+        return false;
     }
 }

@@ -10,11 +10,41 @@ class User {
 
     public function checkFieldsForUnique(string $name, string $email, string $phone): bool {
         $stmt = $this->pdo->prepare("SELECT name, email, phone FROM users 
-                          WHERE name = :name OR email = :email OR phone = :phone");
+                              WHERE name = :name OR email = :email OR phone = :phone");
         $stmt->execute([
             'name' => $name,
             'email' => $email,
             'phone' => $phone
+        ]);
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (empty($user)) {
+            return true;
+        }
+
+        if ($user['email'] == $email) {
+            $_SESSION['validation_errors'][] = 'Пользователь с такой почтой уже зарегистрирован';
+        }
+        if ($user['name'] == $name) {
+            $_SESSION['validation_errors'][] = 'Пользователь с таким именем уже зарегистрирован';
+        }
+        if ($user['phone'] == $phone) {
+            $_SESSION['validation_errors'][] = 'Пользователь с таким номером телефона уже зарегистрирован';
+        }
+
+        return false;
+    }
+
+    public function checkFieldsForUniqueUpdate(string $name, string $email, string $phone): bool {
+        $stmt = $this->pdo->prepare("SELECT name, email, phone FROM users 
+                              WHERE (name = :name
+                                 OR email = :email
+                                 OR phone = :phone) AND id <> :id");
+        $stmt->execute([
+            'id' => $_SESSION['user']['id'],
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
         ]);
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -56,5 +86,15 @@ class User {
         ]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function changePassword(string $password, int $id)
+    {
+        $stmt = $this->pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
+
+        return $stmt->execute([
+            'password' => $password,
+            'id' => $id
+        ]);
     }
 }
