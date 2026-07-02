@@ -8,7 +8,7 @@
 1. git clone https://github.com/samuraj198/only-test
 2. cp src/.env.example src/.env
 3. Скопировать ключи из письма и вставить в файл src/.env
-4. docker-compose up -d (если появится ошибка 500, нужно подождать чтобы бд прогрузилась)
+4. docker-compose up -d (если появится ошибка(-и) SQL, нужно подождать чтобы бд прогрузилась)
 
 ## Всего 4 страницы
 1. / - главная
