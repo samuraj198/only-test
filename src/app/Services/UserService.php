@@ -113,9 +113,11 @@ class UserService {
         if (isset($_SESSION['user'])) {
             unset($_SESSION['user']);
             $_SESSION['validation_errors'] = [];
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public function update(array $data): bool

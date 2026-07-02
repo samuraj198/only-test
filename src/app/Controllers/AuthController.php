@@ -36,9 +36,14 @@ class AuthController {
     }
 
     public function logout(): void {
-        $this->userService->logout();
+        $logoutCheck = $this->userService->logout();
 
-        header('Location: /');
+        if ($logoutCheck) {
+            header('Location: /');
+        } else {
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+        }
+
         exit;
     }
 
