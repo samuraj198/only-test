@@ -11,8 +11,8 @@ if (empty($_SESSION['user'])) {
             <input type="text" name="action" value="updateData" hidden>
             <label>
                 Новое имя
-                <input type="text" name="name" placeholder="Новое имя"
-                       value="<?=$_SESSION['user']['name']?>">
+                <input type="text" name="login" placeholder="Новое имя"
+                       value="<?=$_SESSION['user']['login']?>">
             </label>
             <label>
                 Новая почта

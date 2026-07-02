@@ -2,7 +2,7 @@
     <h2>Форма регистрации</h2>
     <form action="../app/Controllers/AuthController.php" method="POST">
         <input required hidden type="text" name="action" value="register">
-        <input required type="text" name="name" placeholder="Имя">
+        <input required type="text" name="login" placeholder="Логин">
         <input required type="tel" name="phone" placeholder="Номер телефона" pattern="^8\d{10}$">
         <input required type="email" name="email" placeholder="Почта">
         <input required type="password" name="password" placeholder="Пароль">

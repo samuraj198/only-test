@@ -38,7 +38,7 @@ class UserService {
             $_SESSION['validation_errors'][] = "Пароли не совпадают";
             return null;
         }
-        $check = $this->userModel->checkFieldsForUnique($data['name'], $data['email'], $data['phone']);
+        $check = $this->userModel->checkFieldsForUnique($data['login'], $data['email'], $data['phone']);
 
         if ($check) {
             $_SESSION['validation_errors'] = [];
@@ -123,12 +123,12 @@ class UserService {
         $validatedData = $this->validateForUpdate($data);
 
         if ($validatedData != null) {
-            $stmt = $this->pdo->prepare("UPDATE `users` SET name = :name, 
+            $stmt = $this->pdo->prepare("UPDATE `users` SET login = :login, 
                                                            email = :email, 
                                                            phone = :phone 
                                                        WHERE id = :id");
             $check = $stmt->execute([
-                'name' => $data['name'],
+                'login' => $data['login'],
                 'email' => $data['email'],
                 'phone' => $data['phone'],
                 'id' => $_SESSION['user']['id'],
@@ -153,8 +153,8 @@ class UserService {
             return null;
         }
 
-        if (empty($data['name'])) {
-            $data['name'] = $_SESSION['user']['name'];
+        if (empty($data['login'])) {
+            $data['login'] = $_SESSION['user']['login'];
         }
         if (empty($data['email'])) {
             $data['email'] = $_SESSION['user']['email'];
@@ -163,7 +163,7 @@ class UserService {
             $data['phone'] = $_SESSION['user']['phone'];
         }
 
-        $check = $this->userModel->checkFieldsForUniqueUpdate($data['name'], $data['email'], $data['phone']);
+        $check = $this->userModel->checkFieldsForUniqueUpdate($data['login'], $data['email'], $data['phone']);
 
         if ($check) {
             $_SESSION['validation_errors'] = [];

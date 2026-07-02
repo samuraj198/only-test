@@ -8,11 +8,11 @@ class User {
         $this->pdo = $pdo;
     }
 
-    public function checkFieldsForUnique(string $name, string $email, string $phone): bool {
-        $stmt = $this->pdo->prepare("SELECT name, email, phone FROM users 
-                              WHERE name = :name OR email = :email OR phone = :phone");
+    public function checkFieldsForUnique(string $login, string $email, string $phone): bool {
+        $stmt = $this->pdo->prepare("SELECT login, email, phone FROM users 
+                              WHERE login = :login OR email = :email OR phone = :phone");
         $stmt->execute([
-            'name' => $name,
+            'login' => $login,
             'email' => $email,
             'phone' => $phone
         ]);
@@ -25,8 +25,8 @@ class User {
         if ($user['email'] == $email) {
             $_SESSION['validation_errors'][] = 'Пользователь с такой почтой уже зарегистрирован';
         }
-        if ($user['name'] == $name) {
-            $_SESSION['validation_errors'][] = 'Пользователь с таким именем уже зарегистрирован';
+        if ($user['login'] == $name) {
+            $_SESSION['validation_errors'][] = 'Пользователь с таким логином уже зарегистрирован';
         }
         if ($user['phone'] == $phone) {
             $_SESSION['validation_errors'][] = 'Пользователь с таким номером телефона уже зарегистрирован';
@@ -35,14 +35,14 @@ class User {
         return false;
     }
 
-    public function checkFieldsForUniqueUpdate(string $name, string $email, string $phone): bool {
-        $stmt = $this->pdo->prepare("SELECT name, email, phone FROM users 
-                              WHERE (name = :name
+    public function checkFieldsForUniqueUpdate(string $login, string $email, string $phone): bool {
+        $stmt = $this->pdo->prepare("SELECT login, email, phone FROM users 
+                              WHERE (login = :login
                                  OR email = :email
                                  OR phone = :phone) AND id <> :id");
         $stmt->execute([
             'id' => $_SESSION['user']['id'],
-            'name' => $name,
+            'login' => $login,
             'email' => $email,
             'phone' => $phone,
         ]);
@@ -55,8 +55,8 @@ class User {
         if ($user['email'] == $email) {
             $_SESSION['validation_errors'][] = 'Пользователь с такой почтой уже зарегистрирован';
         }
-        if ($user['name'] == $name) {
-            $_SESSION['validation_errors'][] = 'Пользователь с таким именем уже зарегистрирован';
+        if ($user['login'] == $name) {
+            $_SESSION['validation_errors'][] = 'Пользователь с таким логином уже зарегистрирован';
         }
         if ($user['phone'] == $phone) {
             $_SESSION['validation_errors'][] = 'Пользователь с таким номером телефона уже зарегистрирован';
@@ -67,11 +67,11 @@ class User {
 
     public function create(array $data): bool
     {
-        $stmt = $this->pdo->prepare("INSERT INTO users SET name = :name, email = :email,
+        $stmt = $this->pdo->prepare("INSERT INTO users SET login = :login, email = :email,
                       phone = :phone, password = :password");
 
         return $stmt->execute([
-            'name' => $data['name'],
+            'login' => $data['login'],
             'email' => $data['email'],
             'phone' => $data['phone'],
             'password' => $data['password']
