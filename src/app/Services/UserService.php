@@ -38,6 +38,14 @@ class UserService {
             $_SESSION['validation_errors'][] = "Пароли не совпадают";
             return null;
         }
+        if (strlen($data['password']) < 6) {
+            $_SESSION['validation_errors'][] = 'Пароль должен быть минимум из 6 символов';
+            return null;
+        }
+        if (strlen($data['login']) < 2) {
+            $_SESSION['validation_errors'][] = 'Логин должен быть минимум из 2 символов';
+            return null;
+        }
         $check = $this->userModel->checkFieldsForUnique($data['login'], $data['email'], $data['phone']);
 
         if ($check) {
@@ -131,6 +139,10 @@ class UserService {
                 $_SESSION['validation_errors'][] = 'Изменили данные хотя бы в одном поле';
                 return false;
             }
+            if (strlen($data['login']) < 2) {
+                $_SESSION['validation_errors'][] = 'Логин должен быть минимум из 2 символов';
+                return false;
+            }
 
             $stmt = $this->pdo->prepare("UPDATE `users` SET login = :login, 
                                                            email = :email, 
@@ -192,6 +204,11 @@ class UserService {
 
         if (password_verify($data['new_password'], $_SESSION['user']['password'])) {
             $_SESSION['validation_errors'][] = 'Новый пароль должен отличаться от старого';
+            return false;
+        }
+
+        if (strlen($data['new_password']) < 6) {
+            $_SESSION['validation_errors'][] = 'Новый пароль должен быть минимум из 6 символов';
             return false;
         }
 
