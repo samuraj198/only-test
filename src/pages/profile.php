@@ -63,4 +63,14 @@ if (empty($_SESSION['user'])) {
         unset($_SESSION['validation_errors']);
         ?>
     </div>
+    <div class="errors">
+        <?php
+        if (isset($_SESSION['success'])) { ?>
+            <p class="success" style="color: forestgreen">
+                <?=$_SESSION['success']?>
+            </p>
+        <?php unset($_SESSION['success']);
+        }
+        ?>
+    </div>
 </div>

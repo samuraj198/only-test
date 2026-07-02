@@ -2,7 +2,7 @@
 declare(strict_types=1);
 session_start();
 class User {
-    private $pdo;
+    private PDO $pdo;
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
@@ -25,7 +25,7 @@ class User {
         if ($user['email'] == $email) {
             $_SESSION['validation_errors'][] = 'Пользователь с такой почтой уже зарегистрирован';
         }
-        if ($user['login'] == $name) {
+        if ($user['login'] == $login) {
             $_SESSION['validation_errors'][] = 'Пользователь с таким логином уже зарегистрирован';
         }
         if ($user['phone'] == $phone) {
@@ -55,7 +55,7 @@ class User {
         if ($user['email'] == $email) {
             $_SESSION['validation_errors'][] = 'Пользователь с такой почтой уже зарегистрирован';
         }
-        if ($user['login'] == $name) {
+        if ($user['login'] == $login) {
             $_SESSION['validation_errors'][] = 'Пользователь с таким логином уже зарегистрирован';
         }
         if ($user['phone'] == $phone) {
@@ -88,7 +88,7 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function changePassword(string $password, int $id)
+    public function changePassword(string $password, int $id): bool
     {
         $stmt = $this->pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
 

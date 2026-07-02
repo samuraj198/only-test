@@ -3,8 +3,8 @@ require_once __DIR__ . "/../../db/mysql_connection.php";
 require_once __DIR__ . "/../Models/User.php";
 
 class UserService {
-    private $pdo;
-    private $userModel;
+    private PDO $pdo;
+    private User $userModel;
 
     public function __construct($pdo)
     {
@@ -108,7 +108,7 @@ class UserService {
         return $resp->status === "ok";
     }
 
-    public function logout()
+    public function logout(): bool
     {
         if (isset($_SESSION['user'])) {
             unset($_SESSION['user']);
@@ -123,6 +123,13 @@ class UserService {
         $validatedData = $this->validateForUpdate($data);
 
         if ($validatedData != null) {
+            if ($validatedData['login'] == $_SESSION['user']['login']
+            && $validatedData['email'] == $_SESSION['user']['email']
+            && $validatedData['phone'] == $_SESSION['user']['phone']) {
+                $_SESSION['validation_errors'][] = 'Изменили данные хотя бы в одном поле';
+                return false;
+            }
+
             $stmt = $this->pdo->prepare("UPDATE `users` SET login = :login, 
                                                            email = :email, 
                                                            phone = :phone 
@@ -136,6 +143,7 @@ class UserService {
 
             if ($check) {
                 $_SESSION['user'] = $this->userModel->getUser($data['email']);
+                $_SESSION['success'] = 'Вы успешно изменили данные своего профиля';
 
                 return true;
             }
@@ -180,6 +188,11 @@ class UserService {
             return false;
         }
 
+        if (password_verify($data['new_password'], $_SESSION['user']['password'])) {
+            $_SESSION['validation_errors'][] = 'Новый пароль должен отличаться от старого';
+            return false;
+        }
+
         if ($data['new_password'] != $data['new_password_confirmation']) {
             $_SESSION['validation_errors'][] = 'Пароли не совпадают';
             return false;
@@ -195,6 +208,7 @@ class UserService {
 
         if ($changePasswordCheck) {
             $_SESSION['user'] = $this->userModel->getUser($_SESSION['user']['email']);
+            $_SESSION['success'] = 'Вы успешно изменили свой пароль';
             return true;
         }
 
